@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="center_vertical"
+    android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/positionText"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:text="1"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="?android:attr/textColorPrimary"
+        android:gravity="center" />
+
+    <ImageView
+        android:id="@+id/teamLogo"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:src="@android:drawable/ic_menu_gallery" />
+
+    <TextView
+        android:id="@+id/teamNameText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Arsenal"
+        android:textSize="14sp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+    <TextView
+        android:id="@+id/playedText"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:text="38"
+        android:textSize="12sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/winsText"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:text="26"
+        android:textSize="12sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/drawsText"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:text="8"
+        android:textSize="12sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/lossesText"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:text="4"
+        android:textSize="12sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/goalDifferenceText"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:text="+45"
+        android:textSize="12sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/pointsText"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:text="86"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="?android:attr/textColorPrimary"
+        android:gravity="center" />
+
+</LinearLayout>

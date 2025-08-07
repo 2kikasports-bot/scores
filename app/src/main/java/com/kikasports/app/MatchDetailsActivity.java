@@ -590,16 +590,18 @@ public class MatchDetailsActivity extends AppCompatActivity {
     private void displayStatistics(List<Statistic> homeStats, List<Statistic> awayStats) {
         Log.d(TAG, "Displaying statistics - Home: " + homeStats.size() + ", Away: " + awayStats.size());
 
-        if (statisticsLayout == null) {
-            Log.e(TAG, "Statistics layout is null!");
+        if (homeStatsContainer == null || awayStatsContainer == null) {
+            Log.e(TAG, "Statistics containers are null!");
             return;
         }
 
         // Clear existing views
-        statisticsLayout.removeAllViews();
+        homeStatsContainer.removeAllViews();
+        awayStatsContainer.removeAllViews();
 
         if (homeStats.isEmpty() || awayStats.isEmpty()) {
-            addNoDataView(statisticsLayout, "No statistics available");
+            addNoDataView(homeStatsContainer, "No statistics available");
+            addNoDataView(awayStatsContainer, "No statistics available");
             return;
         }
 
@@ -607,27 +609,26 @@ public class MatchDetailsActivity extends AppCompatActivity {
         Statistic awayStat = awayStats.get(0);
 
         // Create stat comparison views
-        addStatComparisonView("Possession", homeStat.possession + "%", awayStat.possession + "%");
-        addStatComparisonView("Shots on Target", String.valueOf(homeStat.shotsOn), String.valueOf(awayStat.shotsOn));
-        addStatComparisonView("Shots off Target", String.valueOf(homeStat.shotsOff), String.valueOf(awayStat.shotsOff));
-        addStatComparisonView("Corners", String.valueOf(homeStat.corners), String.valueOf(awayStat.corners));
-        addStatComparisonView("Fouls", String.valueOf(homeStat.fouls), String.valueOf(awayStat.fouls));
-        addStatComparisonView("Yellow Cards", String.valueOf(homeStat.yellowCards), String.valueOf(awayStat.yellowCards));
-        addStatComparisonView("Red Cards", String.valueOf(homeStat.redCards), String.valueOf(awayStat.redCards));
-        addStatComparisonView("Offsides", String.valueOf(homeStat.offsides), String.valueOf(awayStat.offsides));
+        addStatComparisonView(statisticsLayout, "Possession", homeStat.possession + "%", awayStat.possession + "%");
+        addStatComparisonView(statisticsLayout, "Shots on Target", String.valueOf(homeStat.shotsOn), String.valueOf(awayStat.shotsOn));
+        addStatComparisonView(statisticsLayout, "Shots off Target", String.valueOf(homeStat.shotsOff), String.valueOf(awayStat.shotsOff));
+        addStatComparisonView(statisticsLayout, "Corners", String.valueOf(homeStat.corners), String.valueOf(awayStat.corners));
+        addStatComparisonView(statisticsLayout, "Fouls", String.valueOf(homeStat.fouls), String.valueOf(awayStat.fouls));
+        addStatComparisonView(statisticsLayout, "Yellow Cards", String.valueOf(homeStat.yellowCards), String.valueOf(awayStat.yellowCards));
+        addStatComparisonView(statisticsLayout, "Red Cards", String.valueOf(homeStat.redCards), String.valueOf(awayStat.redCards));
+        addStatComparisonView(statisticsLayout, "Offsides", String.valueOf(homeStat.offsides), String.valueOf(awayStat.offsides));
 
         Log.d(TAG, "Statistics displayed successfully");
     }
 
-    private void addStatComparisonView(String statName, String homeValue, String awayValue) {
-        // Check if the layout exists
-        if (getLayoutInflater() == null) {
-            Log.e(TAG, "Layout inflater is null");
+    private void addStatComparisonView(LinearLayout container, String statName, String homeValue, String awayValue) {
+        if (container == null) {
+            Log.e(TAG, "Container is null for stat: " + statName);
             return;
         }
 
         try {
-            View view = getLayoutInflater().inflate(R.layout.stat_comparison_item, statisticsLayout, false);
+            View view = getLayoutInflater().inflate(R.layout.stat_comparison_item, container, false);
 
             TextView statNameView = view.findViewById(R.id.statName);
             TextView homeStatValue = view.findViewById(R.id.homeStatValue);
@@ -637,14 +638,14 @@ public class MatchDetailsActivity extends AppCompatActivity {
             if (homeStatValue != null) homeStatValue.setText(homeValue);
             if (awayStatValue != null) awayStatValue.setText(awayValue);
 
-            statisticsLayout.addView(view);
+            container.addView(view);
         } catch (Exception e) {
             Log.e(TAG, "Error creating stat comparison view for: " + statName, e);
             // Fallback to simple text view
             TextView fallbackView = new TextView(this);
             fallbackView.setText(statName + ": " + homeValue + " - " + awayValue);
             fallbackView.setPadding(16, 8, 16, 8);
-            statisticsLayout.addView(fallbackView);
+            container.addView(fallbackView);
         }
     }
 

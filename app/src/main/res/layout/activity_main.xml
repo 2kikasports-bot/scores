@@ -1,52 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/swipeRefresh"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?android:attr/colorBackground">
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <!-- Date Selector Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#1a1a1a"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp">
+                android:orientation="vertical">
 
-                <!-- Date Tabs -->
-                <HorizontalScrollView
+                <!-- Date Selector Header -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scrollbars="none"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
+                    android:orientation="vertical"
+                    android:background="?android:attr/colorPrimary"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
 
+                    <!-- Filter Buttons -->
                     <LinearLayout
-                        android:id="@+id/dateTabsContainer"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center"
+                        android:layout_marginBottom="16dp"
+                        android:paddingHorizontal="16dp">
 
-                        <!-- LIVE Button -->
+                        <!-- Live Button -->
                         <LinearLayout
                             android:id="@+id/liveButton"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
                             android:orientation="vertical"
                             android:gravity="center"
                             android:background="@drawable/live_bg"
-                            android:layout_marginEnd="16dp"
+                            android:layout_marginEnd="8dp"
                             android:clickable="true"
                             android:focusable="true">
 
@@ -55,11 +57,278 @@
                                 android:layout_height="wrap_content"
                                 android:text="LIVE"
                                 android:textColor="#ffffff"
-                                android:textSize="14sp"
+                                android:textSize="12sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
-                        <!-- Date tabs will be added programmatically -->
+                        <!-- Upcoming Button -->
+                        <LinearLayout
+                            android:id="@+id/upcomingButton"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/upcoming_bg"
+                            android:layout_marginHorizontal="4dp"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="UPCOMING"
+                                android:textColor="#ffffff"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Full-time Button -->
+                        <LinearLayout
+                            android:id="@+id/fulltimeButton"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/fulltime_bg"
+                            android:layout_marginStart="8dp"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="FULL-TIME"
+                                android:textColor="#ffffff"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Date Tabs -->
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <LinearLayout
+                            android:id="@+id/dateTabsContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <!-- Filter buttons will be added first, then date tabs programmatically -->
+
+                        </LinearLayout>
+                    </HorizontalScrollView>
+                </LinearLayout>
+
+                <!-- Content Container -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Favorites Section -->
+                    <LinearLayout
+                        android:id="@+id/favoritesSection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="12dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="⭐ Your Favorites"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="?android:attr/textColorPrimary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="View All"
+                                android:textSize="14sp"
+                                android:textColor="?android:attr/colorPrimary"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:background="?android:attr/selectableItemBackground"
+                                android:padding="8dp" />
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/favoritesRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="24dp" />
+                    </LinearLayout>
+
+                    <!-- Live Matches Section -->
+                    <LinearLayout
+                        android:id="@+id/liveSection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="12dp">
+
+                            <View
+                                android:layout_width="4dp"
+                                android:layout_height="20dp"
+                                android:background="@color/live_red"
+                                android:layout_marginEnd="12dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="🔴 Live Matches"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/live_red" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="View All"
+                                android:textSize="14sp"
+                                android:textColor="?android:attr/colorPrimary"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:background="?android:attr/selectableItemBackground"
+                                android:padding="8dp" />
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/liveRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="24dp" />
+                    </LinearLayout>
+
+                    <!-- Scheduled Matches Section -->
+                    <LinearLayout
+                        android:id="@+id/scheduledSection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="12dp">
+
+                            <View
+                                android:layout_width="4dp"
+                                android:layout_height="20dp"
+                                android:background="@color/scheduled_blue"
+                                android:layout_marginEnd="12dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="📅 Upcoming Matches"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="?android:attr/textColorPrimary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="View All"
+                                android:textSize="14sp"
+                                android:textColor="?android:attr/colorPrimary"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:background="?android:attr/selectableItemBackground"
+                                android:padding="8dp" />
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/scheduledRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <!-- No Matches Available -->
+                    <LinearLayout
+                        android:id="@+id/noMatchesLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="48dp"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:src="@drawable/ic_football"
+                            android:layout_marginBottom="24dp"
+                            android:alpha="0.5" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="No matches available"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pull down to refresh or try a different date"
+                            android:textSize="14sp"
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:gravity="center" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/colorSurface"
+        app:menu="@menu/bottom_navigation"
+        app:itemIconTint="?android:attr/textColorSecondary"
+        app:itemTextColor="?android:attr/textColorSecondary"
+        app:itemActiveIndicatorStyle="@style/App.Widget.BottomNavigationView.ActiveIndicator" />
+
+</LinearLayout>
 
                     </LinearLayout>
                 </HorizontalScrollView>

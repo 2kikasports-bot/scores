@@ -1,9 +1,11 @@
 <resources>
-    <style name="Theme.KIkaSports" parent="Theme.Material3.DayNight">
-        <item name="colorPrimary">@color/purple_700</item>
-        <item name="colorPrimaryDark">@color/purple_200</item>
-        <item name="colorAccent">@color/teal_700</item>
-        <item name="android:windowBackground">@color/black</item>
+    <style name="Theme.KIkaSports" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
     </style>
 
     <style name="Theme.KIkaSports.Fullscreen" parent="Theme.KIkaSports">

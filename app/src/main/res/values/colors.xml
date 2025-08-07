@@ -8,12 +8,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-
-    <color name="primary">#1B5E20</color>
+    <color name="primary">#1565C0</color>
     <color name="accent">#4CAF50</color>
-    <color name="background">#070E16</color>
-    <color name="cbackground">#172231</color>
-    <color name="mbackground">#223345</color>
+    <color name="background">#F5F5F5</color>
+    <color name="cbackground">#FFFFFF</color>
+    <color name="mbackground">#E3F2FD</color>
     <color name="secondary_text">#757575</color>
     <color name="live_red">#F44336</color>
     <color name="scheduled_blue">#3DA7FF</color>

@@ -12,17 +12,20 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -51,13 +54,15 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
     private static final String TAG = "LiveScore";
     private static final String PREFS_NAME = "LiveScorePrefs";
     private static final String FAVORITES_KEY = "favorites";
+    private static final String THEME_KEY = "dark_theme";
 
     private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 1001;
 
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout favoritesSection, liveSection, scheduledSection, noMatchesLayout;
-    private LinearLayout dateTabsContainer, liveButton;
+    private LinearLayout dateTabsContainer, liveButton, upcomingButton, fulltimeButton;
     private RecyclerView favoritesRecyclerView, liveRecyclerView, scheduledRecyclerView;
+    private BottomNavigationView bottomNavigation;
 
     private MatchAdapter favoritesAdapter, liveAdapter, scheduledAdapter;
     private List<Match> allMatches = new ArrayList<>();
@@ -70,21 +75,23 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
     // Date selection variables
     private List<DateTab> dateTabs = new ArrayList<>();
     private String selectedDate = "";
-    private boolean isLiveMode = false;
+    private int currentFilterMode = 0; // 0: All, 1: Live, 2: Upcoming, 3: Full-time
     private TimezoneConverter timezoneConverter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Apply theme before setContentView
+        applyTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         initViews();
         setupRecyclerViews();
         setupDateSelector();
+        setupBottomNavigation();
         loadFavorites();
         loadMatches();
         startNotificationService();
-
 
         timezoneConverter = new TimezoneConverter(this);
 
@@ -95,6 +102,17 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
         requestNotificationPermission();
 
         swipeRefresh.setOnRefreshListener(this::loadMatches);
+    }
+
+    private void applyTheme() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        boolean isDarkTheme = prefs.getBoolean(THEME_KEY, false);
+        
+        if (isDarkTheme) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
     }
 
     private void initViews() {
@@ -110,8 +128,52 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
 
         dateTabsContainer = findViewById(R.id.dateTabsContainer);
         liveButton = findViewById(R.id.liveButton);
+        upcomingButton = findViewById(R.id.upcomingButton);
+        fulltimeButton = findViewById(R.id.fulltimeButton);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
     }
 
+    private void setupBottomNavigation() {
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_home) {
+                // Already on home
+                return true;
+            } else if (itemId == R.id.nav_leagues) {
+                startActivity(new Intent(this, LeaguesActivity.class));
+                return true;
+            } else if (itemId == R.id.nav_favorites) {
+                // Show only favorites
+                showOnlyFavorites();
+                return true;
+            } else if (itemId == R.id.nav_settings) {
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void showOnlyFavorites() {
+        List<Match> favoriteMatches = new ArrayList<>();
+        for (Match match : allMatches) {
+            if (match.isFavorite()) {
+                favoriteMatches.add(match);
+            }
+        }
+        
+        if (favoriteMatches.isEmpty()) {
+            showNoMatches();
+            return;
+        }
+        
+        hideNoMatches();
+        favoritesSection.setVisibility(View.VISIBLE);
+        liveSection.setVisibility(View.GONE);
+        scheduledSection.setVisibility(View.GONE);
+        
+        favoritesAdapter.updateMatches(favoriteMatches);
+    }
 
     private void requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -129,7 +191,6 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
         }
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -143,8 +204,6 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
             }
         }
     }
-
-
 
     private void setupRecyclerViews() {
         // Favorites matches
@@ -167,15 +226,22 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
     }
 
     private void setupDateSelector() {
-        // Setup live button
+        // Setup filter buttons
         liveButton.setOnClickListener(v -> {
-            isLiveMode = !isLiveMode;
-            updateLiveButtonState();
-            if (isLiveMode) {
-                // Clear date selection when live mode is active
-                selectedDate = "";
-                updateDateTabsState();
-            }
+            currentFilterMode = 1;
+            updateFilterButtonsState();
+            loadMatches();
+        });
+
+        upcomingButton.setOnClickListener(v -> {
+            currentFilterMode = 2;
+            updateFilterButtonsState();
+            loadMatches();
+        });
+
+        fulltimeButton.setOnClickListener(v -> {
+            currentFilterMode = 3;
+            updateFilterButtonsState();
             loadMatches();
         });
 
@@ -211,8 +277,8 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
     }
 
     private void addDateTabsToContainer() {
-        // Remove existing date tabs (keep live button)
-        while (dateTabsContainer.getChildCount() > 1) {
+        // Remove existing date tabs (keep filter buttons)
+        while (dateTabsContainer.getChildCount() > 3) {
             dateTabsContainer.removeViewAt(dateTabsContainer.getChildCount() - 1);
         }
 
@@ -253,9 +319,9 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
 
             // Set click listener
             tabView.setOnClickListener(v -> {
-                isLiveMode = false;
+                currentFilterMode = 0;
                 selectedDate = dateTab.dateValue;
-                updateLiveButtonState();
+                updateFilterButtonsState();
                 updateDateTabsState();
                 loadMatches();
             });
@@ -266,18 +332,23 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
 
     private void updateDateTabsState() {
         // Update date tabs appearance
-        for (int i = 1; i < dateTabsContainer.getChildCount(); i++) {
+        for (int i = 3; i < dateTabsContainer.getChildCount(); i++) {
             View tabView = dateTabsContainer.getChildAt(i);
-            DateTab dateTab = dateTabs.get(i - 1);
-            boolean isSelected = !isLiveMode && selectedDate.equals(dateTab.dateValue);
+            DateTab dateTab = dateTabs.get(i - 3);
+            boolean isSelected = currentFilterMode == 0 && selectedDate.equals(dateTab.dateValue);
             tabView.setSelected(isSelected);
         }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private void updateLiveButtonState() {
-        liveButton.setSelected(isLiveMode);
+    private void updateFilterButtonsState() {
+        liveButton.setSelected(currentFilterMode == 1);
+        upcomingButton.setSelected(currentFilterMode == 2);
+        fulltimeButton.setSelected(currentFilterMode == 3);
+        
         liveButton.setBackground(getDrawable(R.drawable.live_bg));
+        upcomingButton.setBackground(getDrawable(R.drawable.upcoming_bg));
+        fulltimeButton.setBackground(getDrawable(R.drawable.fulltime_bg));
     }
 
     private void loadMatches() {
@@ -287,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
             try {
                 List<Match> matches = new ArrayList<>();
 
-                if (isLiveMode) {
+                if (currentFilterMode == 1) {
                     // Load only live matches
                     matches = loadLiveMatches();
                 } else {
@@ -647,9 +718,9 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
 
         hideNoMatches();
 
-        // Update favorites (only show if not in live mode)
+        // Update favorites (only show if not in filter mode)
         List<Match> favoriteMatches = new ArrayList<>();
-        if (!isLiveMode) {
+        if (currentFilterMode == 0) {
             for (Match match : allMatches) {
                 if (match.isFavorite()) {
                     favoriteMatches.add(match);
@@ -658,24 +729,43 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
         }
         updateFavoritesSection(favoriteMatches);
 
-        // Update live matches
+        // Filter matches based on current mode
         List<Match> liveMatches = new ArrayList<>();
-        for (Match match : allMatches) {
-            if (match.isLive()) {
-                liveMatches.add(match);
-            }
-        }
-        updateSection(liveSection, liveAdapter, liveMatches);
-
-        // Update scheduled matches (hide in live mode)
         List<Match> scheduledMatches = new ArrayList<>();
-        if (!isLiveMode) {
+        
+        if (currentFilterMode == 1) {
+            // Show only live matches
             for (Match match : allMatches) {
-                if (!match.isLive()) {
+                if (match.isLive()) {
+                    liveMatches.add(match);
+                }
+            }
+        } else if (currentFilterMode == 2) {
+            // Show only upcoming matches
+            for (Match match : allMatches) {
+                if (!match.isLive() && "SCHEDULED".equals(match.getStatus())) {
+                    scheduledMatches.add(match);
+                }
+            }
+        } else if (currentFilterMode == 3) {
+            // Show only full-time matches
+            for (Match match : allMatches) {
+                if ("FT".equals(match.getStatus()) || "FINISHED".equals(match.getStatus())) {
+                    scheduledMatches.add(match);
+                }
+            }
+        } else {
+            // Show all matches (default)
+            for (Match match : allMatches) {
+                if (match.isLive()) {
+                    liveMatches.add(match);
+                } else {
                     scheduledMatches.add(match);
                 }
             }
         }
+        
+        updateSection(liveSection, liveAdapter, liveMatches);
         updateSection(scheduledSection, scheduledAdapter, scheduledMatches);
     }
 
@@ -759,7 +849,6 @@ public class MainActivity extends AppCompatActivity implements MatchAdapter.OnFa
         // Update UI to show/hide favorites section
         updateUI();
     }
-
 
     private void startNotificationService() {
         Intent serviceIntent = new Intent(this, MatchNotificationService.class);

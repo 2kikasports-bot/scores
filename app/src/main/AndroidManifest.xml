@@ -17,6 +17,15 @@
             android:name=".MatchDetailsActivity"
             android:exported="false" />
         <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LeaguesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LeagueTableActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.NoActionBar">
